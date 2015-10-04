@@ -86,15 +86,16 @@ public abstract class PositionProvider {
             return;
         }
         if (lastLocation == null ||
-                location.getAccuracy() < lastLocation.getAccuracy() ||
+                Math.floor(location.getAccuracy()/5) < Math.floor(lastLocation.getAccuracy()/5) ||
                 location.hasSpeed() && (!lastLocation.hasSpeed() || speedDeltaThreshold > 0 && Math.abs(location.getSpeed() - lastLocation.getSpeed()) >= speedDeltaThreshold) ||
                 location.hasBearing() && (!lastLocation.hasBearing() || courseDeltaThreshold > 0 && Math.abs(location.getBearing() - lastLocation.getBearing()) >= courseDeltaThreshold) ||
                 location.getTime() - lastLocation.getTime() >= period ||
                 distanceThreshold > 0 && location.distanceTo(lastLocation) >= distanceThreshold
-                )
-        Log.i(TAG, "location new: " + location.toString());
-        lastLocation = location;
-        listener.onPositionUpdate(new Position(deviceId, location, getBatteryLevel()));
+                ) {
+            Log.i(TAG, "location new: " + location.toString());
+            lastLocation = location;
+            listener.onPositionUpdate(new Position(deviceId, location, getBatteryLevel()));
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.ECLAIR)
