@@ -76,6 +76,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "time INTEGER," +
                 "latitude REAL," +
                 "longitude REAL," +
+                "horizontalAccuracy REAL," +
                 "altitude REAL," +
                 "speed REAL," +
                 "course REAL," +
@@ -94,6 +95,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("time", position.getTime().getTime());
         values.put("latitude", position.getLatitude());
         values.put("longitude", position.getLongitude());
+        values.put("horizontalAccuracy", position.getHorizontalAccuracy());
         values.put("altitude", position.getAltitude());
         values.put("speed", position.getSpeed());
         values.put("course", position.getCourse());
@@ -126,6 +128,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 position.setTime(new Date(cursor.getLong(cursor.getColumnIndex("time"))));
                 position.setLatitude(cursor.getDouble(cursor.getColumnIndex("latitude")));
                 position.setLongitude(cursor.getDouble(cursor.getColumnIndex("longitude")));
+                position.setHorizontalAccuracy(cursor.getDouble(cursor.getColumnIndex("horizontalAccuracy")));
                 position.setAltitude(cursor.getDouble(cursor.getColumnIndex("altitude")));
                 position.setSpeed(cursor.getDouble(cursor.getColumnIndex("speed")));
                 position.setCourse(cursor.getDouble(cursor.getColumnIndex("course")));

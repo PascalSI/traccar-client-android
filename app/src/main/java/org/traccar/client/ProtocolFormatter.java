@@ -17,23 +17,27 @@ package org.traccar.client;
 
 import android.location.Location;
 import android.net.Uri;
+import android.util.Log;
 
 public class ProtocolFormatter {
-
     public static String formatRequest(String address, int port, Position position) {
 
         Uri.Builder builder = new Uri.Builder();
         builder.scheme("http").encodedAuthority(address + ':' + port)
+                .appendPath("")
                 .appendQueryParameter("id", position.getDeviceId())
-                .appendQueryParameter("timestamp", String.valueOf(position.getTime().getTime() / 1000))
+                .appendQueryParameter("timestamp", String.valueOf(position.getTime().getTime()))
                 .appendQueryParameter("lat", String.valueOf(position.getLatitude()))
                 .appendQueryParameter("lon", String.valueOf(position.getLongitude()))
+                .appendQueryParameter("hacc", String.valueOf(position.getHorizontalAccuracy()))
                 .appendQueryParameter("speed", String.valueOf(position.getSpeed()))
                 .appendQueryParameter("bearing", String.valueOf(position.getCourse()))
                 .appendQueryParameter("altitude", String.valueOf(position.getAltitude()))
                 .appendQueryParameter("batt", String.valueOf(position.getBattery()));
 
-        return builder.build().toString();
+        String url = builder.build().toString();
+        Log.d("ProtocolFormatter", url);
+        return url;
     }
 
 }

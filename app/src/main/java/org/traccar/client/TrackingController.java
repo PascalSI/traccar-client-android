@@ -116,9 +116,10 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
         if (position != null) {
             action += " (" +
                     "id:" + position.getId() +
-                    " time:" + position.getTime().getTime() / 1000 +
+                    " time:" + position.getTime().getTime() +
                     " lat:" + position.getLatitude() +
-                    " lon:" + position.getLongitude() + ")";
+                    " lon:" + position.getLongitude() +
+                    " hacc:" + position.getHorizontalAccuracy() + ")";
         }
         Log.d(TAG, action);
     }

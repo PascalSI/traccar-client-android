@@ -37,7 +37,7 @@ public class MixedPositionProvider extends PositionProvider implements LocationL
     public void startUpdates() {
         lastFixTime = System.currentTimeMillis();
         locationManager.addGpsStatusListener(this);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, period, 0, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5, 0, this);
     }
 
     public void stopUpdates() {

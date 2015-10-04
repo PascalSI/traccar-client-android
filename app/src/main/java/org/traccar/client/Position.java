@@ -29,6 +29,7 @@ public class Position {
         time = new Date(location.getTime());
         latitude = location.getLatitude();
         longitude = location.getLongitude();
+        horizontalAccuracy = location.getAccuracy();
         altitude = location.getAltitude();
         speed = location.getSpeed() * 1.943844; // speed in knots
         course = location.getBearing();
@@ -54,6 +55,10 @@ public class Position {
     private double longitude;
     public double getLongitude() { return longitude; }
     public void setLongitude(double longitude) { this.longitude = longitude; }
+
+    private double horizontalAccuracy;
+    public double getHorizontalAccuracy() { return horizontalAccuracy; }
+    public void setHorizontalAccuracy(double horizontalAccuracy) { this.horizontalAccuracy = horizontalAccuracy; }
 
     private double altitude;
     public double getAltitude() { return altitude; }

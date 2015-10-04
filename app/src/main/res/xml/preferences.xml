@@ -32,6 +32,34 @@
         android:summary="@string/settings_interval_summary"
         android:title="@string/settings_interval_title" />
 
+    <EditTextPreference
+        android:defaultValue="70"
+        android:key="min_accuracy"
+        android:numeric="integer"
+        android:summary="@string/settings_min_accuracy_summary"
+        android:title="@string/settings_min_accuracy_title" />
+
+    <EditTextPreference
+        android:defaultValue="100"
+        android:key="distance_threshold"
+        android:numeric="integer"
+        android:summary="@string/settings_distance_threshold_summary"
+        android:title="@string/settings_distance_threshold_title" />
+
+    <EditTextPreference
+        android:defaultValue="10"
+        android:key="speed_delta_threshold"
+        android:numeric="integer"
+        android:summary="@string/settings_speed_delta_threshold_summary"
+        android:title="@string/settings_speed_delta_threshold_title" />
+
+    <EditTextPreference
+        android:defaultValue="30"
+        android:key="course_delta_threshold"
+        android:numeric="integer"
+        android:summary="@string/settings_course_delta_threshold_summary"
+        android:title="@string/settings_course_delta_threshold_title" />
+
     <ListPreference
         android:defaultValue="gps"
         android:entries="@array/settings_provider_names"
