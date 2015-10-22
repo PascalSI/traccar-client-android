@@ -57,6 +57,7 @@ public class MainActivity extends PreferenceActivity implements OnSharedPreferen
     public static final String KEY_COURSE_DELTA_THRESHOLD = "course_delta_threshold";
     public static final String KEY_PROVIDER = "provider";
     public static final String KEY_STATUS = "status";
+    public static final String KEY_SCHEDULE = "schedule";
 
     private static final int PERMISSIONS_REQUEST_LOCATION = 2;
 
@@ -115,6 +116,7 @@ public class MainActivity extends PreferenceActivity implements OnSharedPreferen
 
     private void setPreferencesEnabled(boolean enabled) {
         PreferenceScreen preferenceScreen = getPreferenceScreen();
+        preferenceScreen.findPreference(KEY_SCHEDULE).setEnabled(enabled);
         preferenceScreen.findPreference(KEY_DEVICE).setEnabled(enabled);
         preferenceScreen.findPreference(KEY_ADDRESS).setEnabled(enabled);
         preferenceScreen.findPreference(KEY_PORT).setEnabled(enabled);
@@ -189,7 +191,7 @@ public class MainActivity extends PreferenceActivity implements OnSharedPreferen
 
         if (permission) {
             setPreferencesEnabled(false);
-            startService(new Intent(this, TrackingService.class));
+            TrackingScheduler.getInstance(this).startService();
         } else {
             sharedPreferences.edit().putBoolean(KEY_STATUS, false).commit();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -203,7 +205,7 @@ public class MainActivity extends PreferenceActivity implements OnSharedPreferen
     }
 
     private void stopTrackingService() {
-        stopService(new Intent(this, TrackingService.class));
+        TrackingScheduler.getInstance(this).stopService();
         setPreferencesEnabled(true);
     }
 

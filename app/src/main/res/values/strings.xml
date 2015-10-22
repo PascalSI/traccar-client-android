@@ -28,6 +28,11 @@
     <string name="settings_status_on">Stop</string>
     <string name="settings_status_off_summary">Service stopped</string>
     <string name="settings_status_on_summary">Service running</string>
+    <string name="settings_schedule_title">Schedule run status</string>
+    <string name="settings_schedule_off">Off</string>
+    <string name="settings_schedule_on">On</string>
+    <string name="settings_schedule_off_summary">Schedule run off</string>
+    <string name="settings_schedule_on_summary">Schedule run on</string>
     <string name="settings_provider_title">Location provider</string>
     <string name="settings_provider_summary">Source of location data</string>
     <string-array name="settings_provider_names">

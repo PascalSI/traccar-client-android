@@ -27,7 +27,7 @@ public class AutostartReceiver extends WakefulBroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         if (sharedPreferences.getBoolean(MainActivity.KEY_STATUS, false)) {
-            startWakefulService(context, new Intent(context, TrackingService.class));
+            TrackingScheduler.getInstance(context).startService(this);
         }
     }
 
