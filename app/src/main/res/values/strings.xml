@@ -11,8 +11,12 @@
     <string name="settings_port_summary">Tracking server TCP port</string>
     <string name="settings_interval_title">Frequency</string>
     <string name="settings_interval_summary">Messages interval in seconds</string>
+    <string name="settings_min_interval_title">Min interval</string>
+    <string name="settings_min_interval_summary">Min messages interval in seconds</string>
     <string name="settings_min_accuracy_title">Min accuracy</string>
     <string name="settings_min_accuracy_summary">Only take locations which has enough accuracy</string>
+    <string name="settings_accuracy_level_step_title">Accuracy level step</string>
+    <string name="settings_accuracy_level_step_summary">Meters of each accuracy level</string>
     <string name="settings_distance_threshold_title">Distance threshold</string>
     <string name="settings_distance_threshold_summary">Report when location change distance reach threshold if threshold > 0</string>
     <string name="settings_speed_delta_threshold_title">Speed delta threshold</string>

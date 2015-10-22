@@ -44,7 +44,9 @@ public abstract class PositionProvider {
     private String deviceId;
     protected String type;
     protected final long period;
+    protected final long minInterval;
     protected final long minAccuracy;
+    protected final long accuracyLevelStep;
     protected final long distanceThreshold;
     protected final double speedDeltaThreshold;
     protected final long courseDeltaThreshold;
@@ -60,7 +62,9 @@ public abstract class PositionProvider {
 
         deviceId = preferences.getString(MainActivity.KEY_DEVICE, null);
         period = Integer.parseInt(preferences.getString(MainActivity.KEY_INTERVAL, "0")) * 1000;
+        minInterval = Integer.parseInt(preferences.getString(MainActivity.KEY_MIN_INTERVAL, "0")) * 1000;
         minAccuracy = Integer.parseInt(preferences.getString(MainActivity.KEY_MIN_ACCURACY, "0"));
+        accuracyLevelStep = Integer.parseInt(preferences.getString(MainActivity.KEY_ACCURACY_LEVEL_STEP, "1"));
         distanceThreshold = Integer.parseInt(preferences.getString(MainActivity.KEY_DISTANCE_THRESHOLD, "0"));
         speedDeltaThreshold = Integer.parseInt(preferences.getString(MainActivity.KEY_SPEED_DELTA_THRESHOLD, "0")) / 3.6;
         courseDeltaThreshold = Integer.parseInt(preferences.getString(MainActivity.KEY_COURSE_DELTA_THRESHOLD, "0"));
@@ -86,7 +90,7 @@ public abstract class PositionProvider {
             return;
         }
         if (lastLocation == null ||
-                Math.floor(location.getAccuracy()/5) < Math.floor(lastLocation.getAccuracy()/5) ||
+                Math.floor(location.getAccuracy()/accuracyLevelStep) < Math.floor(lastLocation.getAccuracy()/accuracyLevelStep) ||
                 location.hasSpeed() && (!lastLocation.hasSpeed() || speedDeltaThreshold > 0 && Math.abs(location.getSpeed() - lastLocation.getSpeed()) >= speedDeltaThreshold) ||
                 location.hasBearing() && (!lastLocation.hasBearing() || courseDeltaThreshold > 0 && Math.abs(location.getBearing() - lastLocation.getBearing()) >= courseDeltaThreshold) ||
                 location.getTime() - lastLocation.getTime() >= period ||

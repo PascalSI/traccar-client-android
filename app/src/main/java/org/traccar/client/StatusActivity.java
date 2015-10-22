@@ -30,7 +30,7 @@ import android.widget.ArrayAdapter;
 
 public class StatusActivity extends ListActivity {
 
-    private static final int LIMIT = 20;
+    private static final int LIMIT = 50;
 
     private static final LinkedList<String> messages = new LinkedList<String>();
     private static final Set<ArrayAdapter<String>> adapters = new HashSet<ArrayAdapter<String>>();

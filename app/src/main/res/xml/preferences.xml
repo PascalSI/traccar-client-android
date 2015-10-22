@@ -33,11 +33,25 @@
         android:title="@string/settings_interval_title" />
 
     <EditTextPreference
+        android:defaultValue="5"
+        android:key="min_interval"
+        android:numeric="integer"
+        android:summary="@string/settings_min_interval_summary"
+        android:title="@string/settings_min_interval_title" />
+
+    <EditTextPreference
         android:defaultValue="70"
         android:key="min_accuracy"
         android:numeric="integer"
         android:summary="@string/settings_min_accuracy_summary"
         android:title="@string/settings_min_accuracy_title" />
+
+    <EditTextPreference
+        android:defaultValue="5"
+        android:key="accuracy_level_step"
+        android:numeric="integer"
+        android:summary="@string/settings_accuracy_level_step_summary"
+        android:title="@string/settings_accuracy_level_step_title" />
 
     <EditTextPreference
         android:defaultValue="100"

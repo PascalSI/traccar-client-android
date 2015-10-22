@@ -49,7 +49,9 @@ public class MainActivity extends PreferenceActivity implements OnSharedPreferen
     public static final String KEY_ADDRESS = "address";
     public static final String KEY_PORT = "port";
     public static final String KEY_INTERVAL = "interval";
+    public static final String KEY_MIN_INTERVAL = "min_interval";
     public static final String KEY_MIN_ACCURACY = "min_accuracy";
+    public static final String KEY_ACCURACY_LEVEL_STEP = "accuracy_level_step";
     public static final String KEY_DISTANCE_THRESHOLD = "distance_threshold";
     public static final String KEY_SPEED_DELTA_THRESHOLD = "speed_delta_threshold";
     public static final String KEY_COURSE_DELTA_THRESHOLD = "course_delta_threshold";
@@ -117,7 +119,9 @@ public class MainActivity extends PreferenceActivity implements OnSharedPreferen
         preferenceScreen.findPreference(KEY_ADDRESS).setEnabled(enabled);
         preferenceScreen.findPreference(KEY_PORT).setEnabled(enabled);
         preferenceScreen.findPreference(KEY_INTERVAL).setEnabled(enabled);
+        preferenceScreen.findPreference(KEY_MIN_INTERVAL).setEnabled(enabled);
         preferenceScreen.findPreference(KEY_MIN_ACCURACY).setEnabled(enabled);
+        preferenceScreen.findPreference(KEY_ACCURACY_LEVEL_STEP).setEnabled(enabled);
         preferenceScreen.findPreference(KEY_DISTANCE_THRESHOLD).setEnabled(enabled);
         preferenceScreen.findPreference(KEY_SPEED_DELTA_THRESHOLD).setEnabled(enabled);
         preferenceScreen.findPreference(KEY_COURSE_DELTA_THRESHOLD).setEnabled(enabled);
