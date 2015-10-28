@@ -16,7 +16,9 @@
 package org.traccar.client;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -30,7 +32,7 @@ public class RequestManager {
         void onComplete(boolean success);
     }
 
-    private static class RequestAsyncTask extends AsyncTask<String, Void, Boolean> {
+    private static class RequestAsyncTask extends AsyncTask<Pair<String, String>, Void, Boolean> {
 
         private RequestHandler handler;
 
@@ -39,7 +41,7 @@ public class RequestManager {
         }
 
         @Override
-        protected Boolean doInBackground(String... request) {
+        protected Boolean doInBackground(Pair<String, String>... request) {
             return sendRequest(request[0]);
         }
 
@@ -50,13 +52,32 @@ public class RequestManager {
     }
 
     public static boolean sendRequest(String request) {
+        return sendRequest(new Pair<String, String>(request, null));
+    }
+    public static boolean sendRequest(Pair<String, String> request) {
         InputStream inputStream = null;
         try {
-            URL url = new URL(request);
+            URL url = new URL(request.first);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setReadTimeout(TIMEOUT);
             connection.setConnectTimeout(TIMEOUT);
-            connection.connect();
+
+            if (request.second != null) {
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Length", String.valueOf(request.second.getBytes().length));
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+
+                // Send post body
+                DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+                wr.writeBytes(request.second);
+                wr.flush();
+                wr.close();
+            }
+            else {
+                connection.connect();
+            }
+
             inputStream = connection.getInputStream();
             while (inputStream.read() != -1);
             return true;
@@ -74,6 +95,10 @@ public class RequestManager {
     }
 
     public static void sendRequestAsync(String request, RequestHandler handler) {
+        RequestAsyncTask task = new RequestAsyncTask(handler);
+        task.execute(new Pair<String, String>(request, null));
+    }
+    public static void sendRequestAsync(Pair<String, String> request, RequestHandler handler) {
         RequestAsyncTask task = new RequestAsyncTask(handler);
         task.execute(request);
     }

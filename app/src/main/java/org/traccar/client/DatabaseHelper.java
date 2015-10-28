@@ -22,8 +22,11 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -144,11 +147,54 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return position;
     }
 
+    public List<Position> selectPositions(long fetchLimit) {
+        Cursor cursor = db.rawQuery("SELECT * FROM position ORDER BY id DESC LIMIT " + fetchLimit, null);
+        try {
+            if (cursor.getCount() > 0) {
+                List<Position> positions = new LinkedList<Position>();
+
+                cursor.moveToFirst();
+
+                while (!cursor.isAfterLast()) {
+                    Position position = new Position();
+                    position.setId(cursor.getLong(cursor.getColumnIndex("id")));
+                    position.setDeviceId(cursor.getString(cursor.getColumnIndex("deviceId")));
+                    position.setTime(new Date(cursor.getLong(cursor.getColumnIndex("time"))));
+                    position.setLatitude(cursor.getDouble(cursor.getColumnIndex("latitude")));
+                    position.setLongitude(cursor.getDouble(cursor.getColumnIndex("longitude")));
+                    position.setHorizontalAccuracy(cursor.getDouble(cursor.getColumnIndex("horizontalAccuracy")));
+                    position.setAltitude(cursor.getDouble(cursor.getColumnIndex("altitude")));
+                    position.setSpeed(cursor.getDouble(cursor.getColumnIndex("speed")));
+                    position.setCourse(cursor.getDouble(cursor.getColumnIndex("course")));
+                    position.setBattery(cursor.getDouble(cursor.getColumnIndex("battery")));
+
+                    positions.add(position);
+
+                    cursor.moveToNext();
+                }
+                return positions;
+            } else {
+                return null;
+            }
+        } finally {
+            cursor.close();
+        }
+    }
+
     public void selectPositionAsync(DatabaseHandler<Position> handler) {
         new DatabaseAsyncTask<Position>(handler) {
             @Override
             protected Position executeMethod() {
                 return selectPosition();
+            }
+        }.execute();
+    }
+
+    public void selectPositionsAsync(final long fetchLimit, DatabaseHandler< List<Position> > handler) {
+        new DatabaseAsyncTask< List<Position> >(handler) {
+            @Override
+            protected List<Position> executeMethod() {
+                return selectPositions(fetchLimit);
             }
         }.execute();
     }
@@ -159,11 +205,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public void deletePositions(List<Position> positions) {
+        List<String> ids = new LinkedList<>();
+        for (Position position: positions) {
+            ids.add(String.valueOf(position.getId()));
+        }
+        if (db.delete("position", "id IN ("+ TextUtils.join(",", ids)+")", null) != 1) {
+            throw new SQLException();
+        }
+    }
+
     public void deletePositionAsync(final long id, DatabaseHandler<Void> handler) {
         new DatabaseAsyncTask<Void>(handler) {
             @Override
             protected Void executeMethod() {
                 deletePosition(id);
+                return null;
+            }
+        }.execute();
+    }
+
+    public void deletePositionsAsync(final List<Position> positions, DatabaseHandler<Void> handler) {
+        new DatabaseAsyncTask<Void>(handler) {
+            @Override
+            protected Void executeMethod() {
+                deletePositions(positions);
                 return null;
             }
         }.execute();

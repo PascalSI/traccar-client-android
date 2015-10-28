@@ -81,6 +81,20 @@
         android:summary="@string/settings_course_delta_threshold_summary"
         android:title="@string/settings_course_delta_threshold_title" />
 
+    <EditTextPreference
+        android:defaultValue="1"
+        android:key="batch_report_num"
+        android:numeric="integer"
+        android:summary="@string/settings_batch_report_num_summary"
+        android:title="@string/settings_batch_report_num_title" />
+
+    <EditTextPreference
+        android:defaultValue="0"
+        android:key="report_interval"
+        android:numeric="integer"
+        android:summary="@string/settings_report_interval_summary"
+        android:title="@string/settings_report_interval_title" />
+
     <ListPreference
         android:defaultValue="gps"
         android:entries="@array/settings_provider_names"

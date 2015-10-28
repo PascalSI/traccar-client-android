@@ -55,6 +55,8 @@ public class MainActivity extends PreferenceActivity implements OnSharedPreferen
     public static final String KEY_DISTANCE_THRESHOLD = "distance_threshold";
     public static final String KEY_SPEED_DELTA_THRESHOLD = "speed_delta_threshold";
     public static final String KEY_COURSE_DELTA_THRESHOLD = "course_delta_threshold";
+    public static final String KEY_BATCH_REPORT_NUM = "batch_report_num";
+    public static final String KEY_REPORT_INTERVAL = "report_interval";
     public static final String KEY_PROVIDER = "provider";
     public static final String KEY_STATUS = "status";
     public static final String KEY_SCHEDULE = "schedule";

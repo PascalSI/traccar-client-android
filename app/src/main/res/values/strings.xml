@@ -23,6 +23,10 @@
     <string name="settings_speed_delta_threshold_summary">Report when speed change delta reach the threshold</string>
     <string name="settings_course_delta_threshold_title">Course delta threshold</string>
     <string name="settings_course_delta_threshold_summary">Report when course degrees change delta reach the threshold (with the min speed of previous setting)</string>
+    <string name="settings_batch_report_num_title">Batch report num</string>
+    <string name="settings_batch_report_num_summary">Batch report N records with single request</string>
+    <string name="settings_report_interval_title">Report interval</string>
+    <string name="settings_report_interval_summary">Interval seconds between report requests</string>
     <string name="settings_status_title">Service status</string>
     <string name="settings_status_off">Start</string>
     <string name="settings_status_on">Stop</string>

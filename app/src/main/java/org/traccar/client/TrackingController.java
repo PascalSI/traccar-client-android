@@ -22,6 +22,9 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import java.util.Date;
+import java.util.List;
+
 public class TrackingController implements PositionProvider.PositionListener, NetworkManager.NetworkHandler {
 
     private static final String TAG = TrackingController.class.getSimpleName();
@@ -36,6 +39,9 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
 
     private String address;
     private int port;
+    private int batchReportNum;
+    private int reportInterval;
+    private Date lastSuccessReport;
 
     private PositionProvider positionProvider;
     private DatabaseHelper databaseHelper;
@@ -68,6 +74,10 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
 
         address = preferences.getString(MainActivity.KEY_ADDRESS, null);
         port = Integer.parseInt(preferences.getString(MainActivity.KEY_PORT, null));
+        batchReportNum = Integer.parseInt(preferences.getString(MainActivity.KEY_BATCH_REPORT_NUM, null));
+        if (batchReportNum < 1)
+            batchReportNum = 1;
+        reportInterval = Integer.parseInt(preferences.getString(MainActivity.KEY_REPORT_INTERVAL, null));
 
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getClass().getName());
@@ -112,6 +122,9 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
     // read -> send -> retry -> read -> send
     //
 
+    private void log(String action) {
+        Log.d(TAG, action);
+    }
     private void log(String action, Position position) {
         if (position != null) {
             action += " (" +
@@ -120,6 +133,18 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
                     " lat:" + position.getLatitude() +
                     " lon:" + position.getLongitude() +
                     " hacc:" + position.getHorizontalAccuracy() + ")";
+        }
+        Log.d(TAG, action);
+    }
+    private void log(String action, List<Position> positions) {
+        if (positions != null) {
+            for (Position position: positions)
+                action += " (" +
+                        "id:" + position.getId() +
+                        " time:" + position.getTime().getTime() +
+                        " lat:" + position.getLatitude() +
+                        " lon:" + position.getLongitude() +
+                        " hacc:" + position.getHorizontalAccuracy() + ")";
         }
         Log.d(TAG, action);
     }
@@ -141,12 +166,12 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
         });
     }
 
-    private void read() {
-        log("read", null);
+    private void doRead() {
+        log("doRead");
         lock();
-        databaseHelper.selectPositionAsync(new DatabaseHelper.DatabaseHandler<Position>() {
+        databaseHelper.selectPositionsAsync(batchReportNum, new DatabaseHelper.DatabaseHandler<List<Position>>() {
             @Override
-            public void onComplete(boolean success, Position result) {
+            public void onComplete(boolean success, List<Position> result) {
                 if (success) {
                     if (result != null) {
                         send(result);
@@ -161,10 +186,29 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
         });
     }
 
-    private void delete(Position position) {
-        log("delete", position);
+    private void read() {
+        log("read");
+        if (lastSuccessReport != null) {
+            long intervalLeft = new Date().getTime() - lastSuccessReport.getTime() - reportInterval * 1000;
+            if (intervalLeft > 0) {
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isOnline) {
+                            doRead();
+                        }
+                    }
+                }, intervalLeft);
+                return;
+            }
+        }
+        doRead();
+    }
+
+    private void delete(List<Position> positions) {
+        log("delete", positions);
         lock();
-        databaseHelper.deletePositionAsync(position.getId(), new DatabaseHelper.DatabaseHandler<Void>() {
+        databaseHelper.deletePositionsAsync(positions, new DatabaseHelper.DatabaseHandler<Void>() {
             @Override
             public void onComplete(boolean success, Void result) {
                 if (success) {
@@ -177,15 +221,17 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
         });
     }
 
-    private void send(final Position position) {
-        log("send", position);
+    private void send(final List<Position> positions) {
+        log("send", positions);
         lock();
-        String request = ProtocolFormatter.formatRequest(address, port, position);
+        final Date requestTime = new Date();
+        Pair<String, String> request = ProtocolFormatter.formatRequest(address, port, positions);
         RequestManager.sendRequestAsync(request, new RequestManager.RequestHandler() {
             @Override
             public void onComplete(boolean success) {
                 if (success) {
-                    delete(position);
+                    delete(positions);
+                    lastSuccessReport = requestTime;
                 } else {
                     StatusActivity.addMessage(context.getString(R.string.status_send_fail));
                     retry();
@@ -196,7 +242,7 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
     }
 
     private void retry() {
-        log("retry", null);
+        log("retry");
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {

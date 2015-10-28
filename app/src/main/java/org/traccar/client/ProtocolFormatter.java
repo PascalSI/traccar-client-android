@@ -15,9 +15,12 @@
  */
 package org.traccar.client;
 
-import android.location.Location;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class ProtocolFormatter {
     public static String formatRequest(String address, int port, Position position) {
@@ -40,4 +43,32 @@ public class ProtocolFormatter {
         return url;
     }
 
+    public static Pair<String, String> formatRequest(String address, int port, List<Position> positions) {
+
+        if (positions.size() == 1)
+            return new Pair<>(formatRequest(address, port, positions.get(0)), null);
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme("http").encodedAuthority(address + ':' + port)
+                .appendPath("");
+        List<String> records = new LinkedList<>();
+        for (Position position: positions) {
+            builder.clearQuery()
+                    .appendQueryParameter("id", position.getDeviceId())
+                    .appendQueryParameter("timestamp", String.valueOf(position.getTime().getTime()))
+                    .appendQueryParameter("lat", String.valueOf(position.getLatitude()))
+                    .appendQueryParameter("lon", String.valueOf(position.getLongitude()))
+                    .appendQueryParameter("hacc", String.valueOf(position.getHorizontalAccuracy()))
+                    .appendQueryParameter("speed", String.valueOf(position.getSpeed()))
+                    .appendQueryParameter("bearing", String.valueOf(position.getCourse()))
+                    .appendQueryParameter("altitude", String.valueOf(position.getAltitude()))
+                    .appendQueryParameter("batt", String.valueOf(position.getBattery()));
+            String record = builder.build().getEncodedQuery();
+            records.add(record);
+        }
+
+        String url = builder.clearQuery().build().toString();
+        Pair<String, String> result = new Pair<>(url, TextUtils.join("\n", records));
+        Log.d("ProtocolFormatter", result.toString());
+        return result;
+    }
 }
