@@ -60,6 +60,7 @@ public class MainActivity extends PreferenceActivity implements OnSharedPreferen
     public static final String KEY_PROVIDER = "provider";
     public static final String KEY_STATUS = "status";
     public static final String KEY_SCHEDULE = "schedule";
+    public static final String KEY_SAVE_TRAFFIC = "save_traffic";
 
     private static final int PERMISSIONS_REQUEST_LOCATION = 2;
 
@@ -129,6 +130,8 @@ public class MainActivity extends PreferenceActivity implements OnSharedPreferen
         preferenceScreen.findPreference(KEY_DISTANCE_THRESHOLD).setEnabled(enabled);
         preferenceScreen.findPreference(KEY_SPEED_DELTA_THRESHOLD).setEnabled(enabled);
         preferenceScreen.findPreference(KEY_COURSE_DELTA_THRESHOLD).setEnabled(enabled);
+        preferenceScreen.findPreference(KEY_BATCH_REPORT_NUM).setEnabled(enabled);
+        preferenceScreen.findPreference(KEY_REPORT_INTERVAL).setEnabled(enabled);
         preferenceScreen.findPreference(KEY_PROVIDER).setEnabled(enabled);
     }
 

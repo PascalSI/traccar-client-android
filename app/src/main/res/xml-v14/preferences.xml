@@ -19,6 +19,15 @@
         android:switchTextOn="@string/settings_schedule_on"
         android:title="@string/settings_schedule_title" />
 
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="save_traffic"
+        android:summaryOff="@string/settings_save_traffic_off_summary"
+        android:summaryOn="@string/settings_save_traffic_on_summary"
+        android:switchTextOff="@string/settings_save_traffic_off"
+        android:switchTextOn="@string/settings_save_traffic_on"
+        android:title="@string/settings_save_traffic_title" />
+
     <EditTextPreference
         android:key="id"
         android:title="@string/settings_id_title" />

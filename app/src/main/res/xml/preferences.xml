@@ -15,6 +15,13 @@
         android:summaryOn="@string/settings_schedule_on_summary"
         android:title="@string/settings_schedule_title" />
 
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="save_traffic"
+        android:summaryOff="@string/settings_save_traffic_off_summary"
+        android:summaryOn="@string/settings_save_traffic_on_summary"
+        android:title="@string/settings_save_traffic_title" />
+
     <EditTextPreference
         android:key="id"
         android:title="@string/settings_id_title" />

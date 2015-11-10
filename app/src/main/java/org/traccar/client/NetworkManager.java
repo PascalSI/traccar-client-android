@@ -24,6 +24,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 public class NetworkManager extends BroadcastReceiver {
+    public enum NetworkStatus {NotReachable, ReachableViaWiFi, ReachableViaWWAN};
 
     private static final String TAG = NetworkManager.class.getSimpleName();
 
@@ -38,12 +39,23 @@ public class NetworkManager extends BroadcastReceiver {
     }
 
     public interface NetworkHandler {
-        void onNetworkUpdate(boolean isOnline);
+        void onNetworkUpdate(NetworkStatus netStatus);
     }
 
-    public boolean isOnline() {
+    public NetworkStatus status() {
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        if (activeNetwork == null) {
+            Log.i(TAG, "active network null");
+            return NetworkStatus.NotReachable;
+        }
+        Log.i(TAG, "active network type: " + activeNetwork.getType() +
+                ", connecting: " + (activeNetwork.isConnectedOrConnecting() && !activeNetwork.isConnected()) +
+                ", connected: " + activeNetwork.isConnected());
+        if (!activeNetwork.isConnected())
+            return NetworkStatus.NotReachable;
+        if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI)
+            return NetworkStatus.ReachableViaWiFi;
+        return NetworkStatus.ReachableViaWWAN;
     }
 
     public void start() {
@@ -59,9 +71,9 @@ public class NetworkManager extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION) && handler != null) {
-            boolean isOnline = isOnline();
-            Log.i(TAG, "network " + (isOnline ? "on" : "off"));
-            handler.onNetworkUpdate(isOnline);
+            NetworkStatus netStatus = status();
+            Log.i(TAG, "network " + netStatus);
+            handler.onNetworkUpdate(netStatus);
         }
     }
 

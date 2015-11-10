@@ -35,8 +35,13 @@
     <string name="settings_schedule_title">Schedule run status</string>
     <string name="settings_schedule_off">Off</string>
     <string name="settings_schedule_on">On</string>
-    <string name="settings_schedule_off_summary">Schedule run off</string>
-    <string name="settings_schedule_on_summary">Schedule run on</string>
+    <string name="settings_schedule_off_summary">No schedule</string>
+    <string name="settings_schedule_on_summary">Run by schedule</string>
+    <string name="settings_save_traffic_title">Save traffic</string>
+    <string name="settings_save_traffic_off">Off</string>
+    <string name="settings_save_traffic_on">On</string>
+    <string name="settings_save_traffic_off_summary">Off</string>
+    <string name="settings_save_traffic_on_summary">Save traffic for non-wifi</string>
     <string name="settings_provider_title">Location provider</string>
     <string name="settings_provider_summary">Source of location data</string>
     <string-array name="settings_provider_names">

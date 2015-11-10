@@ -31,10 +31,11 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
     private static final int RETRY_DELAY = 30 * 1000;
     private static final int WAKE_LOCK_TIMEOUT = 60 * 1000;
 
-    private boolean isOnline;
+    private NetworkManager.NetworkStatus netStatus;
     private boolean isWaiting;
 
     private Context context;
+    private SharedPreferences preferences;
     private Handler handler;
 
     private String address;
@@ -42,6 +43,7 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
     private int batchReportNum;
     private int reportInterval;
     private Date lastSuccessReport;
+    private Date lastestPositionTime;
 
     private PositionProvider positionProvider;
     private DatabaseHelper databaseHelper;
@@ -62,7 +64,7 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
     public TrackingController(Context context) {
         this.context = context;
         handler = new Handler();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
         if (preferences.getString(MainActivity.KEY_PROVIDER, null).equals("mixed")) {
             positionProvider = new MixedPositionProvider(context, this);
         } else {
@@ -70,7 +72,7 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
         }
         databaseHelper = new DatabaseHelper(context);
         networkManager = new NetworkManager(context, this);
-        isOnline = networkManager.isOnline();
+        netStatus = networkManager.status();
 
         address = preferences.getString(MainActivity.KEY_ADDRESS, null);
         port = Integer.parseInt(preferences.getString(MainActivity.KEY_PORT, null));
@@ -83,8 +85,12 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getClass().getName());
     }
 
+    private boolean saveTraffic() {
+        return preferences.getBoolean(MainActivity.KEY_SAVE_TRAFFIC, true);
+    }
+
     public void start() {
-        if (isOnline) {
+        if (netStatus != NetworkManager.NetworkStatus.NotReachable) {
             read();
         }
         positionProvider.startUpdates();
@@ -106,12 +112,15 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
     }
 
     @Override
-    public void onNetworkUpdate(boolean isOnline) {
-        StatusActivity.addMessage(context.getString(R.string.status_connectivity_change));
-        if (!this.isOnline && isOnline) {
-            read();
+    public void onNetworkUpdate(NetworkManager.NetworkStatus netStatus) {
+        if (this.netStatus != netStatus) {
+            StatusActivity.addMessage("Connectivity " + netStatus);
+            boolean wasOnline = this.netStatus != NetworkManager.NetworkStatus.NotReachable;
+            this.netStatus = netStatus;
+            if (!wasOnline)
+                read();
         }
-        this.isOnline = isOnline;
+
     }
 
     //
@@ -156,7 +165,7 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
             @Override
             public void onComplete(boolean success, Void result) {
                 if (success) {
-                    if (isOnline && isWaiting) {
+                    if (netStatus != NetworkManager.NetworkStatus.NotReachable && isWaiting) {
                         read();
                         isWaiting = false;
                     }
@@ -169,12 +178,16 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
     private void doRead() {
         log("doRead");
         lock();
-        databaseHelper.selectPositionsAsync(batchReportNum, new DatabaseHelper.DatabaseHandler<List<Position>>() {
+        final boolean saveTraffic = this.netStatus != NetworkManager.NetworkStatus.ReachableViaWiFi && this.saveTraffic();
+        databaseHelper.selectPositionsAsync(saveTraffic?1:batchReportNum, new DatabaseHelper.DatabaseHandler<List<Position>>() {
             @Override
             public void onComplete(boolean success, List<Position> result) {
                 if (success) {
                     if (result != null) {
-                        send(result);
+                        if (saveTraffic && lastestPositionTime != null && !result.get(0).getTime().after(lastestPositionTime))
+                            isWaiting = true;
+                        else
+                            send(result);
                     } else {
                         isWaiting = true;
                     }
@@ -188,13 +201,14 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
 
     private void read() {
         log("read");
-        if (lastSuccessReport != null) {
-            long intervalLeft = new Date().getTime() - lastSuccessReport.getTime() - reportInterval * 1000;
+        // if the connection is wifi, we don't need wait.
+        if (netStatus != NetworkManager.NetworkStatus.ReachableViaWiFi && lastSuccessReport != null) {
+            long intervalLeft = reportInterval * 1000 - (new Date().getTime() - lastSuccessReport.getTime());
             if (intervalLeft > 0) {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if (isOnline) {
+                        if (netStatus != NetworkManager.NetworkStatus.NotReachable) {
                             doRead();
                         }
                     }
@@ -202,12 +216,15 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
                 return;
             }
         }
-        doRead();
+        if (netStatus != NetworkManager.NetworkStatus.NotReachable)
+            doRead();
     }
 
     private void delete(List<Position> positions) {
         log("delete", positions);
         lock();
+        if (lastestPositionTime == null || lastestPositionTime.before(positions.get(0).getTime()))
+            lastestPositionTime = positions.get(0).getTime();
         databaseHelper.deletePositionsAsync(positions, new DatabaseHelper.DatabaseHandler<Void>() {
             @Override
             public void onComplete(boolean success, Void result) {
@@ -246,7 +263,7 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (isOnline) {
+                if (netStatus != NetworkManager.NetworkStatus.NotReachable) {
                     read();
                 }
             }
