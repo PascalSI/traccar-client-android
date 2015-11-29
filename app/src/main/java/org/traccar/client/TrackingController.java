@@ -73,6 +73,7 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
         databaseHelper = new DatabaseHelper(context);
         networkManager = new NetworkManager(context, this);
         netStatus = networkManager.status();
+        StatusActivity.addMessage("Connectivity " + netStatus);
 
         address = preferences.getString(MainActivity.KEY_ADDRESS, null);
         port = Integer.parseInt(preferences.getString(MainActivity.KEY_PORT, null));
@@ -117,7 +118,7 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
             StatusActivity.addMessage("Connectivity " + netStatus);
             boolean wasOnline = this.netStatus != NetworkManager.NetworkStatus.NotReachable;
             this.netStatus = netStatus;
-            if (!wasOnline)
+            if (!wasOnline || netStatus == NetworkManager.NetworkStatus.ReachableViaWiFi && isWaiting && this.saveTraffic())
                 read();
         }
 
@@ -205,6 +206,7 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
         if (netStatus != NetworkManager.NetworkStatus.ReachableViaWiFi && lastSuccessReport != null) {
             long intervalLeft = reportInterval * 1000 - (new Date().getTime() - lastSuccessReport.getTime());
             if (intervalLeft > 0) {
+                StatusActivity.addMessage(String.format("wait %.2f secs", intervalLeft/1000.0));
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -247,8 +249,9 @@ public class TrackingController implements PositionProvider.PositionListener, Ne
             @Override
             public void onComplete(boolean success) {
                 if (success) {
-                    delete(positions);
+                    StatusActivity.addMessage("Location sent");
                     lastSuccessReport = requestTime;
+                    delete(positions);
                 } else {
                     StatusActivity.addMessage(context.getString(R.string.status_send_fail));
                     retry();

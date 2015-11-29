@@ -26,7 +26,7 @@
     <string name="settings_batch_report_num_title">Batch report num</string>
     <string name="settings_batch_report_num_summary">Batch report N records with single request</string>
     <string name="settings_report_interval_title">Report interval</string>
-    <string name="settings_report_interval_summary">Interval seconds between report requests</string>
+    <string name="settings_report_interval_summary">Interval seconds between report requests (non-wifi only)</string>
     <string name="settings_status_title">Service status</string>
     <string name="settings_status_off">Start</string>
     <string name="settings_status_on">Stop</string>

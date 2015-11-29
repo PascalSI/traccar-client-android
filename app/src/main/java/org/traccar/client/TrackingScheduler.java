@@ -126,7 +126,7 @@ public class TrackingScheduler {
         calendar.set(Calendar.MINUTE, turnTimeOfDay%60);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        calendar.set(Calendar.DAY_OF_WEEK, dayOfWeek+dayOffset);
+        calendar.add(Calendar.DAY_OF_WEEK, dayOffset);
         Log.d("TrackingScheduler", "turn time: " + calendar.getTime());
         return new Pair<>(nowTrack, calendar.getTime());
     }

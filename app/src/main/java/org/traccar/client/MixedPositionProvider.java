@@ -25,6 +25,7 @@ import android.util.Log;
 
 public class MixedPositionProvider extends PositionProvider implements LocationListener, GpsStatus.Listener {
 
+    protected static final String TAG = MixedPositionProvider.class.getSimpleName();
     private static int FIX_TIMEOUT = 30 * 1000;
 
     private LocationListener backupListener;
@@ -93,17 +94,18 @@ public class MixedPositionProvider extends PositionProvider implements LocationL
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.d(TAG, "onStatusChanged: " + provider + ", " + status);
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-        Log.i(TAG, "provider enabled");
+        Log.i(TAG, "provider enabled: " + provider);
         stopBackupProvider();
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-        Log.i(TAG, "provider disabled");
+        Log.i(TAG, "provider disabled: " + provider);
         startBackupProvider();
     }
 

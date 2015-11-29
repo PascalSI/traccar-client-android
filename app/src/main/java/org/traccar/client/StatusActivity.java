@@ -15,7 +15,7 @@
  */
 package org.traccar.client;
 
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -30,7 +30,7 @@ import android.widget.ArrayAdapter;
 
 public class StatusActivity extends ListActivity {
 
-    private static final int LIMIT = 50;
+    private static final int LIMIT = 10000;
 
     private static final LinkedList<String> messages = new LinkedList<String>();
     private static final Set<ArrayAdapter<String>> adapters = new HashSet<ArrayAdapter<String>>();
@@ -42,8 +42,7 @@ public class StatusActivity extends ListActivity {
     }
 
     public static void addMessage(String message) {
-        DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT);
-        message = format.format(new Date()) + " - " + message;
+        message = new SimpleDateFormat("H:mm:ss").format(new Date()) + " " + message;
         messages.add(message);
         while (messages.size() > LIMIT) {
             messages.removeFirst();

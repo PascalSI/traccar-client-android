@@ -20,8 +20,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 
 public class SimplePositionProvider extends PositionProvider implements LocationListener {
+    protected static final String TAG = SimplePositionProvider.class.getSimpleName();
 
     public SimplePositionProvider(Context context, PositionListener listener) {
         super(context, listener);
@@ -49,10 +51,12 @@ public class SimplePositionProvider extends PositionProvider implements Location
 
     @Override
     public void onProviderEnabled(String provider) {
+        Log.d(TAG, "onProviderEnabled: " + provider);
     }
 
     @Override
     public void onProviderDisabled(String provider) {
+        Log.d(TAG, "onProviderDisabled: " + provider);
     }
 
 }
